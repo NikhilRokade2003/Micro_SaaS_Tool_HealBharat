@@ -1,0 +1,33 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Frontend (if applicable)
+node_modules/
+dist/
+build/
+
+# Database dumps / backups
+*.sql
+*.bak
+*.dump
+
+# Flask specific
+instance/
