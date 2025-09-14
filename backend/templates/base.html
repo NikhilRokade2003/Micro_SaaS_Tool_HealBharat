@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Document Toolkit - Generate Professional Documents{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #334155;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: none;
+            border-radius: 15px;
+        }
+        
+        .footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            padding: 40px 0 20px;
+        }
+        
+        .sidebar {
+            background-color: #f8fafc;
+            min-height: calc(100vh - 76px);
+            padding: 20px 0;
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+        
+        .document-card {
+            transition: all 0.3s ease;
+        }
+        
+        .document-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 40px 0;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="fas fa-file-alt me-2"></i>
+                <strong>Document Toolkit</strong>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if is_logged_in %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown">
+                            Tools
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('tools.invoice_generator') }}">
+                                <i class="fas fa-file-invoice me-2"></i>Invoice Generator
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('tools.qrcode_generator') }}">
+                                <i class="fas fa-qrcode me-2"></i>QR Code Generator
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('tools.resume_builder') }}">
+                                <i class="fas fa-file-alt me-2"></i>Resume Builder
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('tools.certificate_creator') }}">
+                                <i class="fas fa-certificate me-2"></i>Certificate Creator
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if is_logged_in %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i>
+                            {{ current_user.full_name }}
+                            {% if current_user.is_premium() %}
+                            <span class="badge bg-warning ms-2">PRO</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}">
+                                <i class="fas fa-user me-2"></i>Profile
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary btn-sm" href="{{ url_for('auth.signup') }}">Sign Up</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-white mb-3">Document Toolkit</h5>
+                    <p class="mb-3">Generate professional documents with ease. Create invoices, resumes, certificates, and QR codes in minutes.</p>
+                    <div class="d-flex">
+                        <a href="https://www.facebook.com/nikhil.rokade.14268" class="text-light me-3"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/nikhilrokade_official/" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/nikhil-rokade-v22122023/" class="text-light me-3"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <h6 class="text-white mb-3">Tools</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('tools.invoice_generator') }}" class="text-light text-decoration-none">Invoice Generator</a></li>
+                        <li><a href="{{ url_for('tools.qrcode_generator') }}" class="text-light text-decoration-none">QR Code Generator</a></li>
+                        <li><a href="{{ url_for('tools.resume_builder') }}" class="text-light text-decoration-none">Resume Builder</a></li>
+                        <li><a href="{{ url_for('tools.certificate_creator') }}" class="text-light text-decoration-none">Certificate Creator</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6 class="text-white mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light text-decoration-none">About</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Contact</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Privacy</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">Terms</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="text-white mb-3">Support</h6>
+                    <p class="mb-2"><i class="fas fa-envelope me-2"></i> nikhilsrokade2203@gmai.com</p>
+                    <p class="mb-2"><i class="fas fa-phone me-2"></i> +91 89561 122003</p>
+                    <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i> Pune, Maharashtra, India</p>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: #475569;">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Document Toolkit. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> in India</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        // Add loading state to forms
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                    
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }, 10000); // Re-enable after 10 seconds as fallback
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

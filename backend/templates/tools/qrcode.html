@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}QR Code Generator{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-qrcode"></i> QR Code Generator</h2>
+                    <p class="text-muted">Generate QR codes for URLs, WiFi, vCard, and more</p>
+                </div>
+                <div class="card-body">
+                    <form id="qrcodeForm" method="POST" action="/generate" enctype="multipart/form-data">
+                        <input type="hidden" name="tool" value="qrcode">
+                        
+                        <div class="form-group">
+                            <label for="qrType" class="form-label">QR Code Type *</label>
+                            <select class="form-control" id="qrType" name="qr_type" required onchange="toggleFields()">
+                                <option value="url">URL/Website</option>
+                                <option value="wifi">WiFi Network</option>
+                                <option value="vcard">vCard (Contact)</option>
+                                <option value="email">Email</option>
+                                <option value="sms">SMS</option>
+                                <option value="phone">Phone Number</option>
+                                <option value="text">Plain Text</option>
+                            </select>
+                        </div>
+                        
+                        <!-- URL Fields -->
+                        <div id="urlFields" class="qr-fields">
+                            <div class="form-group">
+                                <label for="url" class="form-label">Website URL *</label>
+                                <input type="url" class="form-control" id="url" name="url" 
+                                       placeholder="https://example.com" value="https://example.com">
+                            </div>
+                        </div>
+                        
+                        <!-- WiFi Fields -->
+                        <div id="wifiFields" class="qr-fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="wifiSSID" class="form-label">Network Name (SSID) *</label>
+                                        <input type="text" class="form-control" id="wifiSSID" name="wifi_ssid" 
+                                               placeholder="MyWiFiNetwork">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="wifiPassword" class="form-label">Password</label>
+                                        <input type="text" class="form-control" id="wifiPassword" name="wifi_password" 
+                                               placeholder="password123">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="wifiSecurity" class="form-label">Security Type</label>
+                                        <select class="form-control" id="wifiSecurity" name="wifi_security">
+                                            <option value="WPA">WPA/WPA2</option>
+                                            <option value="WEP">WEP</option>
+                                            <option value="nopass">No Password</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="wifiHidden" class="form-label">Hidden Network</label>
+                                        <select class="form-control" id="wifiHidden" name="wifi_hidden">
+                                            <option value="false">No</option>
+                                            <option value="true">Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- vCard Fields -->
+                        <div id="vcardFields" class="qr-fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="vcardFirstName" class="form-label">First Name *</label>
+                                        <input type="text" class="form-control" id="vcardFirstName" name="vcard_first_name" 
+                                               placeholder="John">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="vcardLastName" class="form-label">Last Name *</label>
+                                        <input type="text" class="form-control" id="vcardLastName" name="vcard_last_name" 
+                                               placeholder="Doe">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="vcardPhone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="vcardPhone" name="vcard_phone" 
+                                               placeholder="+1 (555) 123-4567">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="vcardEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="vcardEmail" name="vcard_email" 
+                                               placeholder="john@example.com">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="vcardOrganization" class="form-label">Organization</label>
+                                <input type="text" class="form-control" id="vcardOrganization" name="vcard_organization" 
+                                       placeholder="Company Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="vcardWebsite" class="form-label">Website</label>
+                                <input type="url" class="form-control" id="vcardWebsite" name="vcard_website" 
+                                       placeholder="https://example.com">
+                            </div>
+                        </div>
+                        
+                        <!-- Email Fields -->
+                        <div id="emailFields" class="qr-fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="emailTo" class="form-label">To Email *</label>
+                                        <input type="email" class="form-control" id="emailTo" name="email_to" 
+                                               placeholder="recipient@example.com">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="emailSubject" class="form-label">Subject</label>
+                                        <input type="text" class="form-control" id="emailSubject" name="email_subject" 
+                                               placeholder="Email Subject">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="emailBody" class="form-label">Message</label>
+                                <textarea class="form-control" id="emailBody" name="email_body" rows="3" 
+                                          placeholder="Email message content"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- SMS Fields -->
+                        <div id="smsFields" class="qr-fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="smsNumber" class="form-label">Phone Number *</label>
+                                        <input type="tel" class="form-control" id="smsNumber" name="sms_number" 
+                                               placeholder="+1 (555) 123-4567">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="smsMessage" class="form-label">Message</label>
+                                        <input type="text" class="form-control" id="smsMessage" name="sms_message" 
+                                               placeholder="SMS message">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Fields -->
+                        <div id="phoneFields" class="qr-fields" style="display: none;">
+                            <div class="form-group">
+                                <label for="phoneNumber" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phoneNumber" name="phone_number" 
+                                       placeholder="+1 (555) 123-4567">
+                            </div>
+                        </div>
+                        
+                        <!-- Text Fields -->
+                        <div id="textFields" class="qr-fields" style="display: none;">
+                            <div class="form-group">
+                                <label for="textContent" class="form-label">Text Content *</label>
+                                <textarea class="form-control" id="textContent" name="text_content" rows="4" 
+                                          placeholder="Enter the text you want to encode in the QR code"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- QR Code Settings -->
+                        <h4 class="mt-4">QR Code Settings</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="qrSize" class="form-label">Size (pixels)</label>
+                                    <select class="form-control" id="qrSize" name="qr_size">
+                                        <option value="200">200x200</option>
+                                        <option value="300" selected>300x300</option>
+                                        <option value="400">400x400</option>
+                                        <option value="500">500x500</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="qrFormat" class="form-label">Format</label>
+                                    <select class="form-control" id="qrFormat" name="qr_format">
+                                        <option value="png" selected>PNG</option>
+                                        <option value="svg">SVG</option>
+                                        <option value="jpg">JPG</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="qrErrorCorrection" class="form-label">Error Correction</label>
+                                    <select class="form-control" id="qrErrorCorrection" name="qr_error_correction">
+                                        <option value="L">Low (7%)</option>
+                                        <option value="M" selected>Medium (15%)</option>
+                                        <option value="Q">Quartile (25%)</option>
+                                        <option value="H">High (30%)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="qrForegroundColor" class="form-label">Foreground Color</label>
+                                    <input type="color" class="form-control" id="qrForegroundColor" name="qr_foreground_color" 
+                                           value="#000000">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="qrBackgroundColor" class="form-label">Background Color</label>
+                                    <input type="color" class="form-control" id="qrBackgroundColor" name="qr_background_color" 
+                                           value="#ffffff">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg" data-action="generate">
+                                <i class="fas fa-qrcode"></i> Generate QR Code
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-eye"></i> Preview</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div id="qrPreview">
+                        <p class="text-muted">QR Code preview will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="download-container mt-4"></div>
+
+<script>
+function toggleFields() {
+    const qrType = document.getElementById('qrType').value;
+    
+    // Hide all field groups
+    document.querySelectorAll('.qr-fields').forEach(field => {
+        field.style.display = 'none';
+    });
+    
+    // Show relevant field group
+    const fieldMap = {
+        'url': 'urlFields',
+        'wifi': 'wifiFields',
+        'vcard': 'vcardFields',
+        'email': 'emailFields',
+        'sms': 'smsFields',
+        'phone': 'phoneFields',
+        'text': 'textFields'
+    };
+    
+    const targetField = fieldMap[qrType];
+    if (targetField) {
+        document.getElementById(targetField).style.display = 'block';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleFields();
+    
+    // Add event listeners for real-time preview
+    const form = document.getElementById('qrcodeForm');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', generatePreview);
+    });
+});
+
+function generatePreview() {
+    const qrType = document.getElementById('qrType').value;
+    const preview = document.getElementById('qrPreview');
+    
+    let content = '';
+    
+    switch (qrType) {
+        case 'url':
+            content = document.getElementById('url').value || 'https://example.com';
+            break;
+        case 'wifi':
+            const ssid = document.getElementById('wifiSSID').value || 'WiFiNetwork';
+            const password = document.getElementById('wifiPassword').value || '';
+            const security = document.getElementById('wifiSecurity').value || 'WPA';
+            content = `WIFI:T:${security};S:${ssid};P:${password};H:false;;`;
+            break;
+        case 'vcard':
+            const firstName = document.getElementById('vcardFirstName').value || 'John';
+            const lastName = document.getElementById('vcardLastName').value || 'Doe';
+            const phone = document.getElementById('vcardPhone').value || '';
+            const email = document.getElementById('vcardEmail').value || '';
+            content = `BEGIN:VCARD\nVERSION:3.0\nFN:${firstName} ${lastName}\nN:${lastName};${firstName};;;\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
+            break;
+        case 'email':
+            const emailTo = document.getElementById('emailTo').value || 'recipient@example.com';
+            const subject = document.getElementById('emailSubject').value || '';
+            const body = document.getElementById('emailBody').value || '';
+            content = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            break;
+        case 'sms':
+            const smsNumber = document.getElementById('smsNumber').value || '+1234567890';
+            const smsMessage = document.getElementById('smsMessage').value || '';
+            content = `sms:${smsNumber}:${encodeURIComponent(smsMessage)}`;
+            break;
+        case 'phone':
+            const phoneNumber = document.getElementById('phoneNumber').value || '+1234567890';
+            content = `tel:${phoneNumber}`;
+            break;
+        case 'text':
+            content = document.getElementById('textContent').value || 'Sample text';
+            break;
+    }
+    
+    // Generate QR code using a simple text representation
+    preview.innerHTML = `
+        <div class="qr-preview-content">
+            <div class="qr-placeholder" style="
+                width: 200px; 
+                height: 200px; 
+                border: 2px dashed #ccc; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                margin: 0 auto;
+                background: #f8f9fa;
+                border-radius: 8px;
+            ">
+                <div class="text-center">
+                    <i class="fas fa-qrcode fa-3x text-muted"></i>
+                    <p class="mt-2 text-muted">QR Code Preview</p>
+                </div>
+            </div>
+            <div class="mt-3">
+                <small class="text-muted">Content: ${content.substring(0, 50)}${content.length > 50 ? '...' : ''}</small>
+            </div>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

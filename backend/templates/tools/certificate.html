@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate Creator{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-certificate"></i> Certificate Creator</h2>
+                    <p class="text-muted">Create professional certificates for events, courses, and achievements</p>
+                </div>
+                <div class="card-body">
+                    <form id="certificateForm" method="POST" action="/generate" enctype="multipart/form-data">
+                        <input type="hidden" name="tool" value="certificate">
+                        
+                        <!-- Certificate Type -->
+                        <div class="form-group">
+                            <label for="certificateType" class="form-label">Certificate Type *</label>
+                            <select class="form-control" id="certificateType" name="certificate_type" required onchange="toggleFields()">
+                                <option value="single">Single Certificate</option>
+                                <option value="bulk">Bulk Certificates (Premium)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Template Selection -->
+                        <div class="form-group">
+                            <label for="certificateTemplate" class="form-label">Choose Template *</label>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="template-option">
+                                        <input type="radio" id="template1" name="certificate_template" value="classic" checked>
+                                        <label for="template1" class="template-label">
+                                            <div class="template-preview">
+                                                <i class="fas fa-certificate fa-2x"></i>
+                                                <h6>Classic</h6>
+                                                <span class="badge badge-success">Free</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="template-option">
+                                        <input type="radio" id="template2" name="certificate_template" value="modern">
+                                        <label for="template2" class="template-label">
+                                            <div class="template-preview">
+                                                <i class="fas fa-certificate fa-2x"></i>
+                                                <h6>Modern</h6>
+                                                <span class="badge badge-success">Free</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="template-option">
+                                        <input type="radio" id="template3" name="certificate_template" value="elegant">
+                                        <label for="template3" class="template-label">
+                                            <div class="template-preview">
+                                                <i class="fas fa-certificate fa-2x"></i>
+                                                <h6>Elegant</h6>
+                                                <span class="badge badge-warning">Premium</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="template-option">
+                                        <input type="radio" id="template4" name="certificate_template" value="corporate">
+                                        <label for="template4" class="template-label">
+                                            <div class="template-preview">
+                                                <i class="fas fa-certificate fa-2x"></i>
+                                                <h6>Corporate</h6>
+                                                <span class="badge badge-warning">Premium</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Single Certificate Fields -->
+                        <div id="singleFields">
+                            <h4>Certificate Details</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="recipientName" class="form-label">Recipient Name *</label>
+                                        <input type="text" class="form-control" id="recipientName" name="recipient_name" 
+                                               value="John Doe" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="courseName" class="form-label">Course/Event Name *</label>
+                                        <input type="text" class="form-control" id="courseName" name="course_name" 
+                                               value="Web Development Fundamentals" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="issuerName" class="form-label">Issuing Organization *</label>
+                                        <input type="text" class="form-control" id="issuerName" name="issuer_name" 
+                                               value="Tech Academy" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="completionDate" class="form-label">Completion Date *</label>
+                                        <input type="date" class="form-control" id="completionDate" name="completion_date" 
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="certificateDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="certificateDescription" name="certificate_description" 
+                                          rows="3">Successfully completed the Web Development Fundamentals course, demonstrating proficiency in HTML, CSS, JavaScript, and modern web development practices.</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Bulk Certificate Fields -->
+                        <div id="bulkFields" style="display: none;">
+                            <h4>Bulk Certificate Details</h4>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Premium Feature:</strong> Upload a CSV file with recipient details to generate multiple certificates at once.
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bulkFile" class="form-label">CSV File *</label>
+                                <div class="file-upload">
+                                    <input type="file" class="form-control" id="bulkFile" name="bulk_file" 
+                                           accept=".csv" data-tooltip="CSV format: name,course,date,description">
+                                    <p class="text-muted">CSV format: name,course,date,description</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bulkIssuerName" class="form-label">Issuing Organization *</label>
+                                <input type="text" class="form-control" id="bulkIssuerName" name="bulk_issuer_name" 
+                                       value="Tech Academy">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bulkDescription" class="form-label">Default Description</label>
+                                <textarea class="form-control" id="bulkDescription" name="bulk_description" 
+                                          rows="3">Successfully completed the course, demonstrating proficiency and dedication to learning.</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Certificate Customization -->
+                        <h4>Customization</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="certificateTitle" class="form-label">Certificate Title</label>
+                                    <input type="text" class="form-control" id="certificateTitle" name="certificate_title" 
+                                           value="Certificate of Completion">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="certificateNumber" class="form-label">Certificate Number</label>
+                                    <input type="text" class="form-control" id="certificateNumber" name="certificate_number" 
+                                           value="CERT-2024-001">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="signatureName" class="form-label">Signature Name</label>
+                                    <input type="text" class="form-control" id="signatureName" name="signature_name" 
+                                           value="Dr. Jane Smith">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="signatureTitle" class="form-label">Signature Title</label>
+                                    <input type="text" class="form-control" id="signatureTitle" name="signature_title" 
+                                           value="Course Director">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Logo Upload -->
+                        <div class="form-group">
+                            <label for="logoUpload" class="form-label">Organization Logo</label>
+                            <div class="file-upload">
+                                <input type="file" class="form-control" id="logoUpload" name="logo_upload" 
+                                       accept="image/*" data-tooltip="Upload your organization logo">
+                                <p class="text-muted">Upload your organization logo (PNG, JPG, SVG)</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Colors -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="primaryColor" class="form-label">Primary Color</label>
+                                    <input type="color" class="form-control" id="primaryColor" name="primary_color" 
+                                           value="#4f46e5">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="secondaryColor" class="form-label">Secondary Color</label>
+                                    <input type="color" class="form-control" id="secondaryColor" name="secondary_color" 
+                                           value="#06b6d4">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="textColor" class="form-label">Text Color</label>
+                                    <input type="color" class="form-control" id="textColor" name="text_color" 
+                                           value="#1f2937">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Output Settings -->
+                        <h4>Output Settings</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="outputFormat" class="form-label">Output Format *</label>
+                                    <select class="form-control" id="outputFormat" name="output_format" required>
+                                        <option value="pdf" selected>PDF</option>
+                                        <option value="png">PNG Image</option>
+                                        <option value="jpg">JPG Image</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="outputQuality" class="form-label">Output Quality</label>
+                                    <select class="form-control" id="outputQuality" name="output_quality">
+                                        <option value="high" selected>High (300 DPI)</option>
+                                        <option value="medium">Medium (150 DPI)</option>
+                                        <option value="low">Low (72 DPI)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg" data-action="generate">
+                                <i class="fas fa-certificate"></i> Generate Certificate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-eye"></i> Preview</h4>
+                </div>
+                <div class="card-body">
+                    <div id="certificatePreview">
+                        <div class="certificate-preview-placeholder">
+                            <i class="fas fa-certificate fa-4x text-muted"></i>
+                            <p class="text-muted mt-3">Certificate preview will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="download-container mt-4"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date to today
+    const today = new Date();
+    document.getElementById('completionDate').value = today.toISOString().split('T')[0];
+    
+    toggleFields();
+    updatePreview();
+    
+    // Add event listeners for real-time preview
+    const form = document.getElementById('certificateForm');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', updatePreview);
+    });
+});
+
+function toggleFields() {
+    const certificateType = document.getElementById('certificateType').value;
+    const singleFields = document.getElementById('singleFields');
+    const bulkFields = document.getElementById('bulkFields');
+    
+    if (certificateType === 'bulk') {
+        singleFields.style.display = 'none';
+        bulkFields.style.display = 'block';
+    } else {
+        singleFields.style.display = 'block';
+        bulkFields.style.display = 'none';
+    }
+}
+
+function updatePreview() {
+    const preview = document.getElementById('certificatePreview');
+    const certificateType = document.getElementById('certificateType').value;
+    
+    if (certificateType === 'bulk') {
+        preview.innerHTML = `
+            <div class="certificate-preview-placeholder">
+                <i class="fas fa-users fa-4x text-muted"></i>
+                <p class="text-muted mt-3">Bulk certificate preview</p>
+                <small class="text-muted">Upload CSV file to see preview</small>
+            </div>
+        `;
+        return;
+    }
+    
+    // Get form values
+    const recipientName = document.getElementById('recipientName').value || 'John Doe';
+    const courseName = document.getElementById('courseName').value || 'Web Development Fundamentals';
+    const issuerName = document.getElementById('issuerName').value || 'Tech Academy';
+    const completionDate = document.getElementById('completionDate').value || new Date().toISOString().split('T')[0];
+    const certificateTitle = document.getElementById('certificateTitle').value || 'Certificate of Completion';
+    const primaryColor = document.getElementById('primaryColor').value || '#4f46e5';
+    const secondaryColor = document.getElementById('secondaryColor').value || '#06b6d4';
+    const textColor = document.getElementById('textColor').value || '#1f2937';
+    
+    // Generate preview HTML
+    preview.innerHTML = `
+        <div class="certificate-preview" style="
+            border: 3px solid ${primaryColor};
+            border-radius: 10px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            color: ${textColor};
+            position: relative;
+            overflow: hidden;
+        ">
+            <div style="
+                position: absolute;
+                top: -50px;
+                right: -50px;
+                width: 100px;
+                height: 100px;
+                background: ${secondaryColor};
+                border-radius: 50%;
+                opacity: 0.1;
+            "></div>
+            <div style="
+                position: absolute;
+                bottom: -30px;
+                left: -30px;
+                width: 60px;
+                height: 60px;
+                background: ${primaryColor};
+                border-radius: 50%;
+                opacity: 0.1;
+            "></div>
+            
+            <div style="margin-bottom: 20px;">
+                <h2 style="color: ${primaryColor}; margin: 0; font-size: 24px; font-weight: bold;">
+                    ${certificateTitle}
+                </h2>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <p style="margin: 0; font-size: 16px;">This is to certify that</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: ${primaryColor}; margin: 0; font-size: 28px; font-weight: bold; text-decoration: underline;">
+                    ${recipientName}
+                </h3>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <p style="margin: 0; font-size: 16px;">has successfully completed</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: ${secondaryColor}; margin: 0; font-size: 20px; font-weight: bold;">
+                    ${courseName}
+                </h4>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <p style="margin: 0; font-size: 14px;">Date: ${new Date(completionDate).toLocaleDateString()}</p>
+            </div>
+            
+            <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: end;">
+                <div style="text-align: left;">
+                    <div style="border-top: 2px solid ${textColor}; width: 150px; margin-bottom: 5px;"></div>
+                    <p style="margin: 0; font-size: 12px; font-weight: bold;">Signature</p>
+                </div>
+                <div style="text-align: center;">
+                    <p style="margin: 0; font-size: 14px; font-weight: bold; color: ${primaryColor};">
+                        ${issuerName}
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+</script>
+
+<style>
+.template-option {
+    margin-bottom: 1rem;
+}
+
+.template-option input[type="radio"] {
+    display: none;
+}
+
+.template-label {
+    display: block;
+    cursor: pointer;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.template-label:hover {
+    border-color: #4f46e5;
+}
+
+.template-option input[type="radio"]:checked + .template-label {
+    border-color: #4f46e5;
+    background-color: #f0f4ff;
+}
+
+.template-preview i {
+    color: #4f46e5;
+    margin-bottom: 0.5rem;
+}
+
+.certificate-preview-placeholder {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+}
+
+.certificate-preview {
+    transform: scale(0.8);
+    transform-origin: top center;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .certificate-preview {
+        transform: scale(0.6);
+    }
+}
+</style>
+{% endblock %}

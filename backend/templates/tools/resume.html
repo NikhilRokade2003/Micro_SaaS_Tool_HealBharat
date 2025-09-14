@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Builder{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-file-alt"></i> Resume Builder</h2>
+                    <p class="text-muted">Create professional resumes with multiple templates</p>
+                </div>
+                <div class="card-body">
+                    <form id="resumeForm" method="POST" action="/generate" enctype="multipart/form-data">
+                        <input type="hidden" name="tool" value="resume">
+                        
+                        <!-- Template Selection -->
+                        <div class="form-group">
+                            <label for="resumeTemplate" class="form-label">Choose Template *</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="template-option">
+                                        <input type="radio" id="template1" name="resume_template" value="modern" checked>
+                                        <label for="template1" class="template-label">
+                                            <div class="template-preview">
+                                                <i class="fas fa-file-alt fa-3x"></i>
+                                                <h5>Modern</h5>
+                                                <span class="badge badge-success">Free</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="template-option">
+                                        <input type="radio" id="template2" name="resume_template" value="classic">
+                                        <label for="template2" class="template-label">
+                                            <div class="template-preview">
+                                                <i class="fas fa-file-alt fa-3x"></i>
+                                                <h5>Classic</h5>
+                                                <span class="badge badge-success">Free</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="template-option">
+                                        <input type="radio" id="template3" name="resume_template" value="creative">
+                                        <label for="template3" class="template-label">
+                                            <div class="template-preview">
+                                                <i class="fas fa-file-alt fa-3x"></i>
+                                                <h5>Creative</h5>
+                                                <span class="badge badge-warning">Premium</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Personal Information -->
+                        <h4>Personal Information</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="firstName" class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" id="firstName" name="first_name" 
+                                           value="John" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="lastName" class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" id="lastName" name="last_name" 
+                                           value="Doe" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="john.doe@example.com" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">Phone *</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           value="+1 (555) 123-4567" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="location" class="form-label">Location *</label>
+                                    <input type="text" class="form-control" id="location" name="location" 
+                                           value="New York, NY" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="website" class="form-label">Website/Portfolio</label>
+                                    <input type="url" class="form-control" id="website" name="website" 
+                                           value="https://johndoe.com">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="summary" class="form-label">Professional Summary *</label>
+                            <textarea class="form-control" id="summary" name="summary" rows="4" required>Experienced software developer with 5+ years of expertise in web development, mobile applications, and cloud technologies. Passionate about creating innovative solutions and leading development teams to deliver high-quality products.</textarea>
+                        </div>
+                        
+                        <!-- Work Experience -->
+                        <h4>Work Experience</h4>
+                        <div id="experienceContainer">
+                            <div class="experience-item">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Job Title *</label>
+                                            <input type="text" class="form-control" name="job_title[]" 
+                                                   value="Senior Software Developer" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Company *</label>
+                                            <input type="text" class="form-control" name="company[]" 
+                                                   value="Tech Solutions Inc." required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Start Date *</label>
+                                            <input type="month" class="form-control" name="start_date[]" 
+                                                   value="2022-01" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">End Date</label>
+                                            <input type="month" class="form-control" name="end_date[]" 
+                                                   value="2024-01">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Description *</label>
+                                    <textarea class="form-control" name="job_description[]" rows="3" required>• Led development of web applications using React and Node.js
+• Collaborated with cross-functional teams to deliver projects on time
+• Mentored junior developers and conducted code reviews
+• Implemented CI/CD pipelines and automated testing</textarea>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeExperience(this)">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="button" class="btn btn-outline-primary" onclick="addExperience()">
+                                <i class="fas fa-plus"></i> Add Experience
+                            </button>
+                        </div>
+                        
+                        <!-- Education -->
+                        <h4>Education</h4>
+                        <div id="educationContainer">
+                            <div class="education-item">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Degree *</label>
+                                            <input type="text" class="form-control" name="degree[]" 
+                                                   value="Bachelor of Science in Computer Science" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Institution *</label>
+                                            <input type="text" class="form-control" name="institution[]" 
+                                                   value="University of Technology" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Graduation Date</label>
+                                            <input type="month" class="form-control" name="graduation_date[]" 
+                                                   value="2020-05">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">GPA (Optional)</label>
+                                            <input type="text" class="form-control" name="gpa[]" 
+                                                   value="3.8/4.0">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeEducation(this)">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="button" class="btn btn-outline-primary" onclick="addEducation()">
+                                <i class="fas fa-plus"></i> Add Education
+                            </button>
+                        </div>
+                        
+                        <!-- Skills -->
+                        <h4>Skills</h4>
+                        <div class="form-group">
+                            <label for="skills" class="form-label">Skills (comma-separated) *</label>
+                            <textarea class="form-control" id="skills" name="skills" rows="3" required>JavaScript, Python, React, Node.js, SQL, Git, AWS, Docker, Agile, Leadership</textarea>
+                        </div>
+                        
+                        <!-- Certifications -->
+                        <h4>Certifications</h4>
+                        <div id="certificationContainer">
+                            <div class="certification-item">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Certification Name</label>
+                                            <input type="text" class="form-control" name="certification_name[]" 
+                                                   value="AWS Certified Developer">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Issuing Organization</label>
+                                            <input type="text" class="form-control" name="certification_org[]" 
+                                                   value="Amazon Web Services">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Issue Date</label>
+                                            <input type="month" class="form-control" name="certification_date[]" 
+                                                   value="2023-06">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Expiry Date (Optional)</label>
+                                            <input type="month" class="form-control" name="certification_expiry[]" 
+                                                   value="2026-06">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeCertification(this)">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="button" class="btn btn-outline-primary" onclick="addCertification()">
+                                <i class="fas fa-plus"></i> Add Certification
+                            </button>
+                        </div>
+                        
+                        <!-- Output Format -->
+                        <h4>Output Settings</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="outputFormat" class="form-label">Output Format *</label>
+                                    <select class="form-control" id="outputFormat" name="output_format" required>
+                                        <option value="pdf" selected>PDF</option>
+                                        <option value="docx">DOCX (Word)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="resumeTitle" class="form-label">Resume Title</label>
+                                    <input type="text" class="form-control" id="resumeTitle" name="resume_title" 
+                                           value="John_Doe_Resume">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg" data-action="generate">
+                                <i class="fas fa-file-pdf"></i> Generate Resume
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-eye"></i> Preview</h4>
+                </div>
+                <div class="card-body">
+                    <div id="resumePreview">
+                        <p class="text-muted">Resume preview will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="download-container mt-4"></div>
+
+<script>
+function addExperience() {
+    const container = document.getElementById('experienceContainer');
+    const newItem = document.createElement('div');
+    newItem.className = 'experience-item mt-3';
+    newItem.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Job Title *</label>
+                    <input type="text" class="form-control" name="job_title[]" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Company *</label>
+                    <input type="text" class="form-control" name="company[]" required>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Start Date *</label>
+                    <input type="month" class="form-control" name="start_date[]" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">End Date</label>
+                    <input type="month" class="form-control" name="end_date[]">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Description *</label>
+            <textarea class="form-control" name="job_description[]" rows="3" required></textarea>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeExperience(this)">
+            <i class="fas fa-trash"></i> Remove
+        </button>
+    `;
+    container.appendChild(newItem);
+}
+
+function removeExperience(button) {
+    button.closest('.experience-item').remove();
+}
+
+function addEducation() {
+    const container = document.getElementById('educationContainer');
+    const newItem = document.createElement('div');
+    newItem.className = 'education-item mt-3';
+    newItem.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Degree *</label>
+                    <input type="text" class="form-control" name="degree[]" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Institution *</label>
+                    <input type="text" class="form-control" name="institution[]" required>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Graduation Date</label>
+                    <input type="month" class="form-control" name="graduation_date[]">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">GPA (Optional)</label>
+                    <input type="text" class="form-control" name="gpa[]">
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeEducation(this)">
+            <i class="fas fa-trash"></i> Remove
+        </button>
+    `;
+    container.appendChild(newItem);
+}
+
+function removeEducation(button) {
+    button.closest('.education-item').remove();
+}
+
+function addCertification() {
+    const container = document.getElementById('certificationContainer');
+    const newItem = document.createElement('div');
+    newItem.className = 'certification-item mt-3';
+    newItem.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Certification Name</label>
+                    <input type="text" class="form-control" name="certification_name[]">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Issuing Organization</label>
+                    <input type="text" class="form-control" name="certification_org[]">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Issue Date</label>
+                    <input type="month" class="form-control" name="certification_date[]">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Expiry Date (Optional)</label>
+                    <input type="month" class="form-control" name="certification_expiry[]">
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeCertification(this)">
+            <i class="fas fa-trash"></i> Remove
+        </button>
+    `;
+    container.appendChild(newItem);
+}
+
+function removeCertification(button) {
+    button.closest('.certification-item').remove();
+}
+</script>
+
+<style>
+.template-option {
+    margin-bottom: 1rem;
+}
+
+.template-option input[type="radio"] {
+    display: none;
+}
+
+.template-label {
+    display: block;
+    cursor: pointer;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.template-label:hover {
+    border-color: #4f46e5;
+}
+
+.template-option input[type="radio"]:checked + .template-label {
+    border-color: #4f46e5;
+    background-color: #f0f4ff;
+}
+
+.template-preview i {
+    color: #4f46e5;
+    margin-bottom: 0.5rem;
+}
+
+.experience-item,
+.education-item,
+.certification-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8fafc;
+}
+</style>
+{% endblock %}

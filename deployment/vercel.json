@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "backend/app.py"
+    }
+  ],
+  "env": {
+    "FLASK_ENV": "production",
+    "SECRET_KEY": "@secret_key",
+    "JWT_SECRET_KEY": "@jwt_secret_key",
+    "DATABASE_URL": "sqlite:///database.db",
+    "RAZORPAY_KEY_ID": "@razorpay_key_id",
+    "RAZORPAY_KEY_SECRET": "@razorpay_key_secret",
+    "STRIPE_PUBLISHABLE_KEY": "@stripe_publishable_key",
+    "STRIPE_SECRET_KEY": "@stripe_secret_key",
+    "ADMIN_EMAIL": "admin@toolkit.com",
+    "ADMIN_PASSWORD": "@admin_password"
+  },
+  "functions": {
+    "backend/app.py": {
+      "maxDuration": 30
+    }
+  }
+}

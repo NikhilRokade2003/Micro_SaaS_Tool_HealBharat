@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing - Document Toolkit{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">Choose Your Plan</h1>
+                <p class="lead mb-5">Select the perfect plan for your document creation needs. Upgrade anytime, cancel anytime.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="pricing-grid">
+            {% for plan_key, plan in plans.items() %}
+            <div class="pricing-card {% if plan_key == 'premium' %}featured{% endif %}">
+                <div class="pricing-header">
+                    <h3 class="pricing-title">{{ plan.name }}</h3>
+                    <div class="pricing-price">
+                        {% if plan.price == 0 %}
+                        Free
+                        {% else %}
+                        ₹{{ plan.price }}<span class="pricing-period">/month</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <ul class="pricing-features">
+                    {% for feature in plan.features %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="pricing-footer">
+                    {% if plan_key == 'free' %}
+                    <a href="{{ url_for('auth.signup') }}" class="btn btn-outline-primary">Get Started</a>
+                    {% else %}
+                    <a href="#" class="btn btn-primary">Upgrade Now</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-6 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Frequently Asked Questions</h2>
+                <p class="lead text-muted">Everything you need to know about our pricing and plans.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Can I change my plan anytime?</h5>
+                <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+                
+                <h5>Is there a free trial?</h5>
+                <p>Our Free plan allows you to try all features with limited usage. No credit card required.</p>
+            </div>
+            <div class="col-md-6">
+                <h5>What payment methods do you accept?</h5>
+                <p>We accept all major credit cards, debit cards, and UPI payments through Razorpay.</p>
+                
+                <h5>Do you offer refunds?</h5>
+                <p>We offer a 30-day money-back guarantee for all paid plans. Contact support for assistance.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.pricing-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-card.featured {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.pricing-card.featured::before {
+    content: "Most Popular";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.pricing-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.pricing-price {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.pricing-period {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6b7280;
+}
+
+.pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.pricing-features li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+}
+
+.pricing-features li:last-child {
+    border-bottom: none;
+}
+
+.pricing-footer {
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-card.featured {
+        transform: none;
+    }
+}
+</style>
+{% endblock %}

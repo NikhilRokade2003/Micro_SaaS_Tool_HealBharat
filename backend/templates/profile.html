@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ user.name or user.email }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Profile Card -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        {% if user.avatar_url %}
+                        <img src="{{ user.avatar_url }}" alt="Profile Picture" class="rounded-circle" width="120" height="120">
+                        {% else %}
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                             style="width: 120px; height: 120px; font-size: 48px;">
+                            {{ (user.name[0] if user.name else user.email[0]).upper() }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h3>{{ user.name or 'No Name Set' }}</h3>
+                    <p class="text-muted">{{ user.email }}</p>
+                    
+                    <div class="subscription-badge mb-3">
+                        {% if user.subscription_plan == 'premium' %}
+                        <span class="badge badge-success badge-lg">
+                            <i class="fas fa-crown"></i> Premium Member
+                        </span>
+                        {% else %}
+                        <span class="badge badge-secondary badge-lg">
+                            <i class="fas fa-user"></i> Free Member
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h4 class="text-primary">{{ user.document_count or 0 }}</h4>
+                                <small class="text-muted">Documents</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-success">{{ user.created_at.strftime('%Y') if user.created_at else '2024' }}</h4>
+                                <small class="text-muted">Member Since</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-info">{{ user.last_login.strftime('%m/%d') if user.last_login else 'N/A' }}</h4>
+                                <small class="text-muted">Last Login</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/tools/invoice" class="btn btn-outline-primary">
+                            <i class="fas fa-file-invoice"></i> Create Invoice
+                        </a>
+                        <a href="/tools/resume" class="btn btn-outline-primary">
+                            <i class="fas fa-file-alt"></i> Build Resume
+                        </a>
+                        <a href="/tools/certificate" class="btn btn-outline-primary">
+                            <i class="fas fa-certificate"></i> Create Certificate
+                        </a>
+                        <a href="/tools/qrcode" class="btn btn-outline-primary">
+                            <i class="fas fa-qrcode"></i> Generate QR Code
+                        </a>
+                        {% if user.subscription_plan != 'premium' %}
+                        <a href="/pricing" class="btn btn-warning">
+                            <i class="fas fa-crown"></i> Upgrade to Premium
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <!-- Profile Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>Profile Information</h4>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm" method="POST" action="/profile/update">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ user.name or '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ user.email }}" readonly>
+                                    <small class="text-muted">Email cannot be changed</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           value="{{ user.phone or '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="company" class="form-label">Company</label>
+                                    <input type="text" class="form-control" id="company" name="company" 
+                                           value="{{ user.company or '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3" 
+                                      placeholder="Tell us about yourself...">{{ user.bio or '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="avatar" class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                            <small class="text-muted">Upload a profile picture (JPG, PNG, max 2MB)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Subscription Information -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>Subscription Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Current Plan</h5>
+                            {% if user.subscription_plan == 'premium' %}
+                            <div class="subscription-info">
+                                <span class="badge badge-success badge-lg mb-2">
+                                    <i class="fas fa-crown"></i> Premium Plan
+                                </span>
+                                <p class="text-muted">You have access to all features and unlimited document generation.</p>
+                                {% if user.subscription_expires_at %}
+                                <p><strong>Expires:</strong> {{ user.subscription_expires_at.strftime('%B %d, %Y') }}</p>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="subscription-info">
+                                <span class="badge badge-secondary badge-lg mb-2">
+                                    <i class="fas fa-user"></i> Free Plan
+                                </span>
+                                <p class="text-muted">Limited to 5 documents per month with basic templates.</p>
+                                <a href="/pricing" class="btn btn-warning">
+                                    <i class="fas fa-crown"></i> Upgrade to Premium
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Usage Statistics</h5>
+                            <div class="usage-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Documents Created:</span>
+                                    <span class="stat-value">{{ user.document_count or 0 }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">This Month:</span>
+                                    <span class="stat-value">{{ user.monthly_document_count or 0 }}</span>
+                                </div>
+                                {% if user.subscription_plan != 'premium' %}
+                                <div class="stat-item">
+                                    <span class="stat-label">Monthly Limit:</span>
+                                    <span class="stat-value">5</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Documents -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>Recent Documents</h4>
+                </div>
+                <div class="card-body">
+                    {% if recent_documents %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Name</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in recent_documents %}
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-{{ 'primary' if doc.document_type == 'invoice' else 'success' if doc.document_type == 'resume' else 'warning' if doc.document_type == 'certificate' else 'info' }}">
+                                            {{ doc.document_type.title() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ doc.filename or 'Untitled Document' }}</td>
+                                    <td>{{ doc.created_at.strftime('%Y-%m-%d %H:%M') if doc.created_at else 'N/A' }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="/download/{{ doc.id }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteDocument({{ doc.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="/dashboard" class="btn btn-outline-primary">View All Documents</a>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No documents created yet</p>
+                        <a href="/tools/invoice" class="btn btn-primary">Create Your First Document</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Account Settings -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>Account Settings</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Change Password</h5>
+                            <form id="passwordForm" method="POST" action="/profile/change-password">
+                                <div class="form-group">
+                                    <label for="currentPassword" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+                                </div>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Account Actions</h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-info" onclick="exportData()">
+                                    <i class="fas fa-download"></i> Export My Data
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="downloadInvoices()">
+                                    <i class="fas fa-file-invoice"></i> Download Invoices
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteAccount()">
+                                    <i class="fas fa-trash"></i> Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteDocument(documentId) {
+    if (!confirm('Are you sure you want to delete this document?')) {
+        return;
+    }
+    
+    fetch(`/delete-document/${documentId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            DocumentToolkit.showAlert('success', 'Document deleted successfully!');
+            location.reload();
+        } else {
+            DocumentToolkit.showAlert('danger', data.message || 'Failed to delete document');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        DocumentToolkit.showAlert('danger', 'Network error');
+    });
+}
+
+function exportData() {
+    if (!confirm('This will download all your data as a ZIP file. Continue?')) {
+        return;
+    }
+    
+    window.location.href = '/profile/export-data';
+}
+
+function downloadInvoices() {
+    window.location.href = '/profile/download-invoices';
+}
+
+function deleteAccount() {
+    if (!confirm('Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.')) {
+        return;
+    }
+    
+    const password = prompt('Please enter your password to confirm account deletion:');
+    if (!password) {
+        return;
+    }
+    
+    fetch('/profile/delete-account', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            DocumentToolkit.showAlert('success', 'Account deleted successfully. Redirecting...');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        } else {
+            DocumentToolkit.showAlert('danger', data.message || 'Failed to delete account');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        DocumentToolkit.showAlert('danger', 'Network error');
+    });
+}
+
+// Form validation
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (newPassword !== confirmPassword) {
+        DocumentToolkit.showAlert('danger', 'New passwords do not match');
+        return;
+    }
+    
+    if (newPassword.length < 6) {
+        DocumentToolkit.showAlert('danger', 'Password must be at least 6 characters long');
+        return;
+    }
+    
+    // Submit form
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            DocumentToolkit.showAlert('success', 'Password changed successfully!');
+            this.reset();
+        } else {
+            DocumentToolkit.showAlert('danger', data.message || 'Failed to change password');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        DocumentToolkit.showAlert('danger', 'Network error');
+    });
+});
+</script>
+
+<style>
+.profile-avatar img {
+    border: 4px solid #e5e7eb;
+    transition: border-color 0.2s ease;
+}
+
+.profile-avatar img:hover {
+    border-color: #4f46e5;
+}
+
+.subscription-badge .badge-lg {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+.profile-stats h4 {
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+}
+
+.usage-stats {
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.stat-value {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.badge-lg {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .profile-stats .row {
+        text-align: center;
+    }
+    
+    .profile-stats .col-4 {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}

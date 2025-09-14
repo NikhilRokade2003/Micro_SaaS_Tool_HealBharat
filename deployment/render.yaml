@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: document-toolkit
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///database.db
+      - key: RAZORPAY_KEY_ID
+        value: rzp_test_your_key_id
+      - key: RAZORPAY_KEY_SECRET
+        value: rzp_test_your_key_secret
+      - key: STRIPE_PUBLISHABLE_KEY
+        value: pk_test_your_publishable_key
+      - key: STRIPE_SECRET_KEY
+        value: sk_test_your_secret_key
+      - key: ADMIN_EMAIL
+        value: admin@toolkit.com
+      - key: ADMIN_PASSWORD
+        value: admin123
+    healthCheckPath: /health
+    autoDeploy: true
+    branch: main
+    rootDir: backend
